@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>XTK WebGL Cube Art Visualization</title>
+  
+  <!-- Primary Local XTK with CDN Fallback -->
+  <script type="text/javascript" src="xtk_edge.js"></script>
+  <script type="text/javascript">
+    if (typeof window.X === 'undefined') {
+      document.write('<script type="text/javascript" src="https://get.goXTK.com/xtk_edge.js"><\/script>');
+    }
+  </script>
+
+  <!-- Modern Cyberpunk Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Ambient Backdrop -->
+  <div class="space-backdrop"></div>
+
+  <!-- Floating Toast Notification -->
+  <div id="toast">✨ Welcome to XTK Cube Art</div>
+
+  <!-- HUD Overlay -->
+  <div id="hud-overlay">
+    
+    <!-- Top Navigation Bar -->
+    <header class="top-bar">
+      <!-- Brand & Project Details -->
+      <div class="brand-section interactive">
+        <div class="brand-title">
+          <span>Kinetic Voxel Art</span>
+          <span class="xtk-badge">XTK 3D</span>
+        </div>
+        <div class="brand-subtitle">CS460 Interactive WebGL Sculpture</div>
+      </div>
+
+      <!-- Live Performance & Scene Stats -->
+      <div class="stats-bar interactive">
+        <div class="stat-pill">
+          <div class="live-indicator"></div>
+          <span>FPS:</span>
+          <strong id="fps-value">60</strong>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-pill">
+          <span>Core:</span>
+          <strong id="core-count-badge">125</strong>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-pill">
+          <span>Flying:</span>
+          <strong id="flying-count-badge">40</strong>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-pill">
+          <span>Mode:</span>
+          <strong id="active-formation-badge">Tesseract</strong>
+        </div>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="top-actions interactive">
+        <button id="play-pause-btn" class="icon-btn" title="Pause / Resume Animation [Space]">
+          <span>⏸</span> Pause
+        </button>
+        <button id="auto-orbit-btn" class="icon-btn active" title="Toggle Cinematic Camera Orbit [O]">
+          <span>🎥</span> Orbit
+        </button>
+        <button id="toggle-sidebar-btn" class="icon-btn active" title="Toggle Controls Panel [H]">
+          <span>⚙️</span> Controls
+        </button>
+      </div>
+    </header>
+
+    <!-- Slide-out Cyberpunk Control Drawer -->
+    <aside id="controls-sidebar" class="controls-sidebar interactive">
+      <div class="sidebar-header">
+        <div class="sidebar-title">
+          <span>⚡</span> Sculpture Controls
+        </div>
+      </div>
+
+      <div class="sidebar-scroll">
+        <!-- 1. Formations Selection -->
+        <div class="control-group">
+          <div class="group-title">
+            <span>Morph Formations</span>
+            <span>[1-6]</span>
+          </div>
+          <div class="btn-grid">
+            <button class="mode-btn active" data-formation="tesseract">
+              <span>Hypercube</span>
+              <span class="shortcut-badge">Grid (1)</span>
+            </button>
+            <button class="mode-btn" data-formation="helix">
+              <span>DNA Helix</span>
+              <span class="shortcut-badge">Spiral (2)</span>
+            </button>
+            <button class="mode-btn" data-formation="skyline">
+              <span>Skyline</span>
+              <span class="shortcut-badge">Metropolis (3)</span>
+            </button>
+            <button class="mode-btn" data-formation="rings">
+              <span>Saturn Rings</span>
+              <span class="shortcut-badge">Gyro (4)</span>
+            </button>
+            <button class="mode-btn" data-formation="trefoil">
+              <span>Torus Knot</span>
+              <span class="shortcut-badge">Trefoil (5)</span>
+            </button>
+            <button class="mode-btn" data-formation="vortex">
+              <span>Galaxy Spiral</span>
+              <span class="shortcut-badge">Vortex (6)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. Color Themes & Shaders -->
+        <div class="control-group">
+          <div class="group-title">
+            <span>Color Palettes</span>
+            <span>[C / M]</span>
+          </div>
+          <div class="btn-grid-3">
+            <button class="mode-btn active" data-theme="cyberpunk">Cyber</button>
+            <button class="mode-btn" data-theme="sunset">Sunset</button>
+            <button class="mode-btn" data-theme="aurora">Aurora</button>
+            <button class="mode-btn" data-theme="prismatic">Rainbow</button>
+            <button class="mode-btn" data-theme="gold">Gold</button>
+            <button id="magic-mode-btn" class="mode-btn" title="XTK Normal-Based Iridescent Shader">Magic ✨</button>
+          </div>
+        </div>
+
+        <!-- 3. Wave & Kinetic Dynamics -->
+        <div class="control-group">
+          <div class="group-title">Wave Motion</div>
+          
+          <div class="slider-control">
+            <div class="slider-header">
+              <span>Animation Speed</span>
+              <span id="speed-val" class="slider-value">1.0x</span>
+            </div>
+            <input type="range" id="speed-slider" min="0.1" max="2.5" step="0.1" value="1.0">
+          </div>
+
+          <div class="slider-control">
+            <div class="slider-header">
+              <span>Wave Amplitude</span>
+              <span id="amp-val" class="slider-value">22</span>
+            </div>
+            <input type="range" id="amp-slider" min="0" max="60" step="2" value="22">
+          </div>
+
+          <div class="slider-control">
+            <div class="slider-header">
+              <span>Wave Frequency</span>
+              <span id="freq-val" class="slider-value">0.04</span>
+            </div>
+            <input type="range" id="freq-slider" min="0.01" max="0.1" step="0.005" value="0.04">
+          </div>
+        </div>
+
+        <!-- 4. Flying Cubes Swarm Physics -->
+        <div class="control-group">
+          <div class="group-title">Flying Cubes & Physics</div>
+
+          <div class="slider-control">
+            <div class="slider-header">
+              <span>Active Swarm Count</span>
+              <span id="flying-val" class="slider-value">40</span>
+            </div>
+            <input type="range" id="flying-slider" min="0" max="80" step="5" value="40">
+          </div>
+
+          <div class="btn-grid">
+            <button id="attractor-btn" class="mode-btn active">
+              <span>Gravity Field</span>
+              <span class="shortcut-badge">Attractor</span>
+            </button>
+            <button id="burst-btn" class="mode-btn">
+              <span>Meteor Burst</span>
+              <span class="shortcut-badge">[F] Launch</span>
+            </button>
+          </div>
+
+          <button id="shockwave-btn" class="action-btn">
+            <span>💥</span> Trigger Shockwave [B]
+          </button>
+        </div>
+
+        <!-- 5. Camera Presets -->
+        <div class="control-group">
+          <div class="group-title">Camera Angles</div>
+          <div class="btn-grid-3">
+            <button class="mode-btn" data-cam="front">Front</button>
+            <button class="mode-btn" data-cam="iso">Isometric</button>
+            <button class="mode-btn" data-cam="top">Top</button>
+            <button class="mode-btn" data-cam="macro">Macro</button>
+            <button class="mode-btn" data-cam="dramatic">Dramatic</button>
+          </div>
+        </div>
+
+        <!-- 6. Audio Reactive Engine -->
+        <div class="control-group">
+          <div class="group-title">Audio Reactive</div>
+          <div class="btn-grid">
+            <button id="audio-toggle-btn" class="mode-btn">
+              <span>🔇</span> Beat Synth
+            </button>
+            <button id="mic-toggle-btn" class="mode-btn">
+              <span>🎙️</span> Live Mic
+            </button>
+          </div>
+          <div class="audio-visualizer-box">
+            <canvas id="audio-canvas"></canvas>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Bottom Bar: Shortcuts Legend -->
+    <footer class="bottom-bar">
+      <div class="shortcuts-legend interactive">
+        <div><span class="key-tag">Space</span>Play/Pause</div>
+        <div><span class="key-tag">1-6</span>Formations</div>
+        <div><span class="key-tag">C</span>Colors</div>
+        <div><span class="key-tag">M</span>Magic</div>
+        <div><span class="key-tag">F</span>Fly Burst</div>
+        <div><span class="key-tag">B</span>Shockwave</div>
+        <div><span class="key-tag">O</span>Orbit</div>
+        <div><span class="key-tag">H</span>Hide UI</div>
+      </div>
+
+      <div class="quick-controls interactive">
+        <button class="icon-btn" onclick="document.getElementById('burst-btn').click()" title="Fire Flying Cubes [F]">
+          🚀 Fly Burst
+        </button>
+        <button class="icon-btn" onclick="document.getElementById('shockwave-btn').click()" title="Shockwave Blast [B]">
+          💥 Shockwave
+        </button>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Core Interactive Script -->
+  <script type="text/javascript" src="app.js"></script>
+</body>
+</html>

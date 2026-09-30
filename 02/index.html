@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Cube Galaxy - XTK WebGL</title>
+
+  <!-- Clean, full-window canvas styles -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Local XTK with CDN Fallback -->
+  <script type="text/javascript" src="xtk_edge.js"></script>
+  <script type="text/javascript">
+    if (typeof window.X === 'undefined') {
+      document.write('<script type="text/javascript" src="https://get.goXTK.com/xtk_edge.js"><\/script>');
+    }
+  </script>
+</head>
+<body>
+  <!-- Container for XTK WebGL Canvas -->
+  <div id="container"></div>
+
+  <!-- Cube Galaxy Engine -->
+  <script type="text/javascript" src="main.js"></script>
+</body>
+</html>
